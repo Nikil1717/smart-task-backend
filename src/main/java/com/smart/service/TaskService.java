@@ -8,6 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.smart.entity.Project;
 import com.smart.entity.Task;
 import com.smart.entity.User;
+import com.smart.exception.BadRequestException;
+import com.smart.exception.ResourceNotFoundException;
+import com.smart.exception.UnauthorizedException;
 import com.smart.repository.ProjectRepository;
 import com.smart.repository.TaskRepository;
 import com.smart.repository.UserRepository;
@@ -27,36 +30,38 @@ public class TaskService {
 		this.userRepository = userRepository;
 		this.projectRepository = projectRepository;
 	}
-	@Transactional
+	
+	@Transactional()
 	public Task createTask(Task task, Long currentUserId) {
 		Project project = projectRepository.findById(task.getProject().getId())
-				.orElseThrow(() -> new RuntimeException("Project Not Found"));
+				.orElseThrow(() -> new ResourceNotFoundException("Project Not Found"));
 
 		if (!project.getUser().getId().equals(currentUserId)) {
-			throw new RuntimeException("UnAthorized");
+			throw new UnauthorizedException("UnAthorized");
 		}
 
 		User assignedUser = userRepository.findById(task.getAssignedUser().getId())
-				.orElseThrow(() -> new RuntimeException("Assigned User Not Found"));
+				.orElseThrow(() -> new ResourceNotFoundException("Assigned User Not Found"));
 
 		if (!assignedUser.getId().equals(project.getUser().getId())) {
-		    throw new RuntimeException("Assigned user must belong to project");
+		    throw new ResourceNotFoundException("Assigned user must belong to project");
 		}
 		
 		task.setProject(project);
 		task.setAssignedUser(assignedUser);
 
-		return taskRepository.save(task);
+		return taskRepository.save(task);	 
+		
 	}
 
 	@Transactional(readOnly=true)
 	public List<Task> getTasksByProject(Long projectId, Long currentUserId) {
 
 		Project project = projectRepository.findById(projectId)
-				.orElseThrow(() -> new RuntimeException("Project not found"));
+				.orElseThrow(() -> new ResourceNotFoundException("Project not found"));
 
 		if (!project.getUser().getId().equals(currentUserId)) {
-			throw new RuntimeException("Unauthorized");
+			throw new UnauthorizedException("Unauthorized");
 		}
 		return taskRepository.findByProjectId(projectId);
 
@@ -68,7 +73,7 @@ public class TaskService {
 		User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
 		if (!userId.equals(currentUserId)) {
-			throw new RuntimeException("Unauthorized");
+			throw new UnauthorizedException("Unauthorized");
 		}
 
 		return taskRepository.findByAssignedUserId(userId);	
@@ -80,11 +85,11 @@ public class TaskService {
 
 		if (!task.getAssignedUser().getId().equals(currentUserId)
 				&& !task.getProject().getUser().getId().equals(currentUserId)) {
-			throw new RuntimeException("Unauthorized");
+			throw new UnauthorizedException("Unauthorized");
 		}
 		
 		if (status == null || status.isBlank()) {
-		    throw new RuntimeException("Invalid status");
+		    throw new BadRequestException("Invalid status");
 		}
 
 		task.setStatus(status);
