@@ -3,6 +3,7 @@ package com.smart.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.smart.entity.Project;
 import com.smart.entity.Task;
@@ -10,6 +11,8 @@ import com.smart.entity.User;
 import com.smart.repository.ProjectRepository;
 import com.smart.repository.TaskRepository;
 import com.smart.repository.UserRepository;
+
+
 
 @Service
 public class TaskService {
@@ -24,17 +27,17 @@ public class TaskService {
 		this.userRepository = userRepository;
 		this.projectRepository = projectRepository;
 	}
-
+	@Transactional
 	public Task createTask(Task task, Long currentUserId) {
 		Project project = projectRepository.findById(task.getProject().getId())
 				.orElseThrow(() -> new RuntimeException("Project Not Found"));
 
 		if (!project.getUser().getId().equals(currentUserId)) {
-			throw new RuntimeException("Unathorized");
+			throw new RuntimeException("UnAthorized");
 		}
 
 		User assignedUser = userRepository.findById(task.getAssignedUser().getId())
-				.orElseThrow(() -> new RuntimeException("Assiggned User Not Found"));
+				.orElseThrow(() -> new RuntimeException("Assigned User Not Found"));
 
 		if (!assignedUser.getId().equals(project.getUser().getId())) {
 		    throw new RuntimeException("Assigned user must belong to project");
@@ -46,6 +49,7 @@ public class TaskService {
 		return taskRepository.save(task);
 	}
 
+	@Transactional(readOnly=true)
 	public List<Task> getTasksByProject(Long projectId, Long currentUserId) {
 
 		Project project = projectRepository.findById(projectId)
@@ -58,6 +62,7 @@ public class TaskService {
 
 	}
 
+	@Transactional(readOnly=true)
 	public List<Task> getTasksByUser(Long userId, Long currentUserId) {
 
 		User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
@@ -69,7 +74,7 @@ public class TaskService {
 		return taskRepository.findByAssignedUserId(userId);	
 
 	}
-
+   @Transactional
 	public Task updateTaskStatus(Long taskId, String status, Long currentUserId) {
 		Task task = taskRepository.findById(taskId).orElseThrow(() -> new RuntimeException("Task Not Found"));
 
