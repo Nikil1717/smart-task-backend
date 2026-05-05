@@ -4,8 +4,12 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.smart.dto.ProjectRequestDTO;
+import com.smart.dto.ProjectResponseDTO;
 import com.smart.entity.Project;
 import com.smart.entity.User;
+import com.smart.exception.BadRequestException;
+import com.smart.exception.ResourceNotFoundException;
 import com.smart.repository.ProjectRepository;
 import com.smart.repository.UserRepository;
 
@@ -21,23 +25,44 @@ public class ProjectService {
 				
 	}
 	
-	public Project createProject(Project project) {
-
-	    if (project.getUser() == null || project.getUser().getId() == null) {
-	        throw new RuntimeException("User ID is required");
-	    }
-
-	    User user = userRepository.findById(project.getUser().getId())
-	            .orElseThrow(() -> new RuntimeException("User not found"));
-
-	    project.setUser(user);
-
-	    return projectRepository.save(project);
+	public ProjectResponseDTO convertToDTO(Project project) {
+		ProjectResponseDTO project1=new ProjectResponseDTO();
+		
+		project1.setDescription(project.getDescription());
+		project1.setId(project.getId());
+		project1.setName(project.getName());
+		project1.setUserId(project.getUser().getId());
+		
+		return project1;
 	}
 	
-	public List<Project> getProjectsByUser(Long userId){
+	
+	public ProjectResponseDTO createProject(ProjectRequestDTO project) {
+
+	    if (project.getUserId() == null) {
+	        throw new BadRequestException("User ID is required");
+	    }
+
+	    User user = userRepository.findById(project.getUserId())
+	            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+	    Project project1=new Project();
+	    project1.setName(project.getName());
+	    project1.setDescription(project.getDescription());
+	    project1.setUser(user);
+
+	    Project project2= projectRepository.save(project1);
+	    
+	    return convertToDTO(project2);
+	}
+	
+	public List<ProjectResponseDTO> getProjectsByUser(Long userId){
 		
-		return projectRepository.findByUserId(userId);
+		List<Project> projects= projectRepository.findByUserId(userId);
+		
+		return projects.stream()
+					.map(project -> convertToDTO(project))
+					.toList();
 		
 	}
 }

@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.smart.dto.TaskRequestDTO;
+import com.smart.dto.TaskResponseDTO;
 import com.smart.entity.Task;
 import com.smart.service.TaskService;
 
@@ -25,22 +27,22 @@ public class TaskController {
     }
 
     @PostMapping
-    public Task createTask(@RequestBody Task task) {
+    public TaskResponseDTO createTask(@RequestBody TaskRequestDTO task) {
         return taskService.createTask(task, 1L); // hardcoded user
     }
 
     @GetMapping("/project/{projectId}")
-    public List<Task> getByProject(@PathVariable Long projectId) {
+    public List<TaskResponseDTO> getByProject(@PathVariable Long projectId) {
         return taskService.getTasksByProject(projectId, 1L);
     }
 
     @GetMapping("/user/{userId}")
-    public List<Task> getByUser(@PathVariable Long userId) {
+    public List<TaskResponseDTO> getByUser(@PathVariable Long userId) {
         return taskService.getTasksByUser(userId, 1L);
     }
 
     @PatchMapping("/{taskId}/status")
-    public Task updateStatus(@PathVariable Long taskId, @RequestParam String status) {
+    public TaskResponseDTO updateStatus(@PathVariable Long taskId, @RequestParam String status) {
         return taskService.updateTaskStatus(taskId, status, 1L);
     }
 }
