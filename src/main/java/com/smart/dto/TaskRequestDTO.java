@@ -2,16 +2,25 @@ package com.smart.dto;
 
 import java.time.LocalDate;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class TaskRequestDTO {
 
-	
+		@NotBlank
 	    private String title;
+		@NotBlank
 	    private String description;
+		@NotBlank
 	    private String status;
+		@NotBlank
 	    private String priority;
+		@NotNull
 	    private LocalDate dueDate;
 
+		@NotNull
 	    private Long projectId;
+		@NotNull
 	    private Long assignedUserId;
 	    
 		public String getTitle() {

@@ -21,7 +21,7 @@ public class Project {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@NotBlank
+	
 	@Column(nullable = false)
     private String name;
 	private String description;

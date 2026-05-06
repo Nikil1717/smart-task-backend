@@ -8,6 +8,8 @@ import com.smart.dto.ProjectRequestDTO;
 import com.smart.dto.ProjectResponseDTO;
 import com.smart.service.ProjectService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/projects")
 public class ProjectController {
@@ -21,9 +23,8 @@ public class ProjectController {
 
    
     @PostMapping
-    public ProjectResponseDTO createProject(@RequestBody ProjectRequestDTO request) {
-    	System.out.println("Controller hit");
-    	System.out.println("Request: " + request);
+    public ProjectResponseDTO createProject( @Valid @RequestBody ProjectRequestDTO request) {
+    	
         return projectService.createProject(request);
     }
 
@@ -33,8 +34,5 @@ public class ProjectController {
         return projectService.getProjectsByUser(userId);
     }
     
-    @GetMapping("/test")
-    public String test() {
-        return "working";
-    }
+   
 }

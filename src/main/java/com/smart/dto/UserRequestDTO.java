@@ -1,11 +1,20 @@
 package com.smart.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 public class UserRequestDTO {
 
+	@NotBlank
 	private String name;
+	@Email
+	@NotBlank
 	private String email;
-	private String passowrd;
+	@NotBlank
+	private String password;
+	@NotBlank
 	private String role;
+	
 	public String getName() {
 		return name;
 	}
@@ -18,11 +27,11 @@ public class UserRequestDTO {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public String getPassowrd() {
-		return passowrd;
+	public String getPassword() {
+		return password;
 	}
-	public void setPassowrd(String passowrd) {
-		this.passowrd = passowrd;
+	public void setPassword(String password) {
+		this.password = password;
 	}
 	public String getRole() {
 		return role;

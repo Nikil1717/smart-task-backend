@@ -1,9 +1,15 @@
 package com.smart.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class ProjectRequestDTO {
 
+	@NotBlank
 	private String name;
+	@NotBlank
 	private String description;
+	@NotNull
 	private Long userId;
 	
 	

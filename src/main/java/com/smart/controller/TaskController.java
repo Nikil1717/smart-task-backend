@@ -16,6 +16,8 @@ import com.smart.dto.TaskResponseDTO;
 import com.smart.entity.Task;
 import com.smart.service.TaskService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/tasks")
 public class TaskController {
@@ -27,7 +29,7 @@ public class TaskController {
     }
 
     @PostMapping
-    public TaskResponseDTO createTask(@RequestBody TaskRequestDTO task) {
+    public TaskResponseDTO createTask(@Valid @RequestBody TaskRequestDTO task) {
         return taskService.createTask(task, 1L); // hardcoded user
     }
 

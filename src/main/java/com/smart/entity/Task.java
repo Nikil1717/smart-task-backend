@@ -23,18 +23,18 @@ public class Task {
 	 @Id
 	 @GeneratedValue(strategy = GenerationType.IDENTITY)
 	 private Long id;
-	 @NotBlank
+	
 	 @Column(nullable = false)
 	 private String title;
 	
 	 private String description;
-	 @NotBlank
+	
 	 @Column(nullable = false)
 	 private String status;
-	 @NotBlank
+	
 	 @Column(nullable = false)
 	 private String priority;
-     @NotNull
+    
      @Column(nullable = false)
 	 private LocalDate dueDate;
      @CreationTimestamp
