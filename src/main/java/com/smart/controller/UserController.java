@@ -14,7 +14,7 @@ import com.smart.service.UserService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/users/")
 public class UserController {
 
 	private final UserService userService;

@@ -1,6 +1,7 @@
 package com.smart.service;
 
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.smart.dto.UserRequestDTO;
@@ -15,8 +16,11 @@ public class UserService {
 	
 	private final UserRepository userRepository;
 	
-	public UserService(UserRepository userRepository) {
+	private final PasswordEncoder passwordEncoder;
+	
+	public UserService(UserRepository userRepository,PasswordEncoder passwordEncoder) {
 		this.userRepository=userRepository;
+		this.passwordEncoder=passwordEncoder;
 	}
 	
 	private UserResponseDTO convertToDTO(User user) {
@@ -34,7 +38,8 @@ public class UserService {
 		 User user=new User();
 		 user.setEmail(userRequest.getEmail());
 		 user.setName(userRequest.getName());
-		 user.setPassword(userRequest.getPassword());
+		 String hashedPassword = passwordEncoder.encode(userRequest.getPassword());
+		 user.setPassword(hashedPassword);
 		 user.setRole(userRequest.getRole());
 		 User user1= userRepository.save(user);
 		 return convertToDTO(user1);
