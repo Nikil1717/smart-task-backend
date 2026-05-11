@@ -9,18 +9,20 @@ import com.smart.dto.UserResponseDTO;
 import com.smart.entity.User;
 import com.smart.exception.ResourceNotFoundException;
 import com.smart.repository.UserRepository;
+import com.smart.security.AuthenticatedUserService;
 
 @Service
 public class UserService {
 
 	
 	private final UserRepository userRepository;
-	
+	private final AuthenticatedUserService authenticatedUserService;
 	private final PasswordEncoder passwordEncoder;
 	
-	public UserService(UserRepository userRepository,PasswordEncoder passwordEncoder) {
+	public UserService(UserRepository userRepository,PasswordEncoder passwordEncoder,AuthenticatedUserService authenticatedUserService) {
 		this.userRepository=userRepository;
 		this.passwordEncoder=passwordEncoder;
+		this.authenticatedUserService=authenticatedUserService;
 	}
 	
 	private UserResponseDTO convertToDTO(User user) {
@@ -40,7 +42,7 @@ public class UserService {
 		 user.setName(userRequest.getName());
 		 String hashedPassword = passwordEncoder.encode(userRequest.getPassword());
 		 user.setPassword(hashedPassword);
-		 user.setRole(userRequest.getRole());
+		 user.setRole("ROLE_USER");
 		 User user1= userRepository.save(user);
 		 return convertToDTO(user1);
 		
@@ -57,5 +59,10 @@ public class UserService {
 		User user= userRepository.findByEmail(email).orElseThrow(()->new ResourceNotFoundException("User Not Found"));
 		return convertToDTO(user);
 		
+	}
+	
+	public UserResponseDTO getMyProfile() {
+		User currentUser=authenticatedUserService.getCurrentUser();
+		return convertToDTO(currentUser);
 	}
 }

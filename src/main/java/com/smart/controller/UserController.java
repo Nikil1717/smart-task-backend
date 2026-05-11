@@ -1,5 +1,6 @@
 package com.smart.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,10 +15,11 @@ import com.smart.service.UserService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/users/")
+@RequestMapping("/users")
 public class UserController {
 
 	private final UserService userService;
+	
 	
 	public UserController(UserService userService) {
 		this.userService=userService;
@@ -29,13 +31,20 @@ public class UserController {
 	}
 	
 	@GetMapping("/id/{userId}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public UserResponseDTO getUserById(@PathVariable Long userId) {
 		return userService.getUserById(userId);
 	}
 	
 	@GetMapping("/email/{email}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public UserResponseDTO getUserByEmail(@PathVariable String email) {
 		return userService.getUserByEmail(email);
+	}
+	
+	@GetMapping("/me")
+	public UserResponseDTO getMyProfile() {
+		return userService.getMyProfile();
 	}
 	
 	

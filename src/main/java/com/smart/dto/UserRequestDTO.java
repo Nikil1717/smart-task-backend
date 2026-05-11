@@ -12,8 +12,6 @@ public class UserRequestDTO {
 	private String email;
 	@NotBlank
 	private String password;
-	@NotBlank
-	private String role;
 	
 	public String getName() {
 		return name;
@@ -33,12 +31,7 @@ public class UserRequestDTO {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	public String getRole() {
-		return role;
-	}
-	public void setRole(String role) {
-		this.role = role;
-	}
+	
 	
 	
 }

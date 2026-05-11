@@ -9,8 +9,7 @@ public class ProjectRequestDTO {
 	private String name;
 	@NotBlank
 	private String description;
-	@NotNull
-	private Long userId;
+
 	
 	
 	public String getName() {
@@ -25,12 +24,7 @@ public class ProjectRequestDTO {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public Long getUserId() {
-		return userId;
-	}
-	public void setUserId(Long userId) {
-		this.userId = userId;
-	}
+
 	
 	
 }

@@ -12,16 +12,17 @@ import com.smart.exception.BadRequestException;
 import com.smart.exception.ResourceNotFoundException;
 import com.smart.repository.ProjectRepository;
 import com.smart.repository.UserRepository;
+import com.smart.security.AuthenticatedUserService;
 
 @Service
 public class ProjectService {
 
 	private final ProjectRepository projectRepository;
-	private final UserRepository userRepository;
+	private final AuthenticatedUserService authenticatedUserService;
 	
-	public ProjectService(ProjectRepository projectRepository,UserRepository userRepository) {
+	public ProjectService(ProjectRepository projectRepository,UserRepository userRepository,AuthenticatedUserService authenticatedUserService) {
 		this.projectRepository=projectRepository;
-		this.userRepository=userRepository;
+		this.authenticatedUserService=authenticatedUserService;
 				
 	}
 	
@@ -39,26 +40,23 @@ public class ProjectService {
 	
 	public ProjectResponseDTO createProject(ProjectRequestDTO project) {
 
-	    if (project.getUserId() == null) {
-	        throw new BadRequestException("User ID is required");
-	    }
-
-	    User user = userRepository.findById(project.getUserId())
-	            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+	 User currentUser=authenticatedUserService.getCurrentUser();
 
 	    Project project1=new Project();
 	    project1.setName(project.getName());
 	    project1.setDescription(project.getDescription());
-	    project1.setUser(user);
+	    project1.setUser(currentUser);
 
 	    Project project2= projectRepository.save(project1);
 	    
 	    return convertToDTO(project2);
 	}
 	
-	public List<ProjectResponseDTO> getProjectsByUser(Long userId){
+	public List<ProjectResponseDTO> getMyProjects(){
 		
-		List<Project> projects= projectRepository.findByUserId(userId);
+		User currentUser =authenticatedUserService.getCurrentUser();
+		
+		List<Project> projects= projectRepository.findByUserId(currentUser.getId());
 		
 		return projects.stream()
 					.map(project -> convertToDTO(project))
