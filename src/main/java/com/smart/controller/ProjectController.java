@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.smart.dto.ProjectRequestDTO;
 import com.smart.dto.ProjectResponseDTO;
+import com.smart.dto.UserResponseDTO;
 import com.smart.service.ProjectService;
 
 import jakarta.validation.Valid;
@@ -34,5 +35,22 @@ public class ProjectController {
         return projectService.getMyProjects();
     }
     
+    @GetMapping("/{projectId}")
+    public ProjectResponseDTO getProjectById(
+            @PathVariable Long projectId
+    ) {
+        return projectService.getProjectById(projectId);
+    }
+    
+    @PutMapping("/{projectId}")
+	public ProjectResponseDTO updateProject(@PathVariable Long projectId,@RequestBody ProjectRequestDTO dto) {
+		return projectService.updateProject(projectId, dto);
+	}
+    
+    @DeleteMapping("/{projectId}")
+    public void deleteProject(@PathVariable Long projectId) {
+    	projectService.deleteProject(projectId);
+    }
+	
    
 }

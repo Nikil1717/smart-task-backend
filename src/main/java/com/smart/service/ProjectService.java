@@ -37,6 +37,27 @@ public class ProjectService {
 		return project1;
 	}
 	
+	private Project getProjectIfOwnedByCurrentUser(Long projectId) {
+
+	    User currentUser =
+	            authenticatedUserService.getCurrentUser();
+
+	    Project project =
+	            projectRepository.findById(projectId)
+	                    .orElseThrow(() ->
+	                            new ResourceNotFoundException(
+	                                    "Project not found"
+	                            ));
+
+	    if (!project.getUser().getId().equals(currentUser.getId())) {
+	        throw new BadRequestException(
+	                "You are not allowed to access this project"
+	        );
+	    }
+
+	    return project;
+	}
+	
 	
 	public ProjectResponseDTO createProject(ProjectRequestDTO project) {
 
@@ -62,5 +83,29 @@ public class ProjectService {
 					.map(project -> convertToDTO(project))
 					.toList();
 		
+	}
+	public ProjectResponseDTO getProjectById(Long projectId) {
+
+	    Project project =
+	            getProjectIfOwnedByCurrentUser(projectId);
+
+	    return convertToDTO(project);
+	}
+	
+	public ProjectResponseDTO updateProject(Long projectId,ProjectRequestDTO dto) {
+		Project project=getProjectIfOwnedByCurrentUser(projectId);
+		
+		project.setName(dto.getName());
+		project.setDescription(dto.getDescription());
+		
+		Project updatedProject=projectRepository.save(project);
+		
+		return convertToDTO(updatedProject);
+	}
+	
+	public void deleteProject(Long projectId) {
+		Project project=getProjectIfOwnedByCurrentUser(projectId);
+		
+		projectRepository.deleteById(projectId);
 	}
 }

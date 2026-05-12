@@ -30,21 +30,21 @@ public class TaskController {
 
     @PostMapping
     public TaskResponseDTO createTask(@Valid @RequestBody TaskRequestDTO task) {
-        return taskService.createTask(task, 1L); // hardcoded user
+        return taskService.createTask(task); // hardcoded user
     }
 
     @GetMapping("/project/{projectId}")
     public List<TaskResponseDTO> getByProject(@PathVariable Long projectId) {
-        return taskService.getTasksByProject(projectId, 1L);
+        return taskService.getTasksByProject(projectId);
     }
 
     @GetMapping("/user/{userId}")
     public List<TaskResponseDTO> getByUser(@PathVariable Long userId) {
-        return taskService.getTasksByUser(userId, 1L);
+        return taskService.getTasksByUser();
     }
 
     @PatchMapping("/{taskId}/status")
     public TaskResponseDTO updateStatus(@PathVariable Long taskId, @RequestParam String status) {
-        return taskService.updateTaskStatus(taskId, status, 1L);
+        return taskService.updateTaskStatus(taskId, status);
     }
 }

@@ -16,6 +16,7 @@ import com.smart.exception.UnauthorizedException;
 import com.smart.repository.ProjectRepository;
 import com.smart.repository.TaskRepository;
 import com.smart.repository.UserRepository;
+import com.smart.security.AuthenticatedUserService;
 
 
 
@@ -25,12 +26,14 @@ public class TaskService {
 	private final TaskRepository taskRepository;
 	private final UserRepository userRepository;
 	private final ProjectRepository projectRepository;
+	private final AuthenticatedUserService authenticatedUserService;
 
 	public TaskService(TaskRepository taskRepository, UserRepository userRepository,
-			ProjectRepository projectRepository) {
+			ProjectRepository projectRepository,AuthenticatedUserService authenticatedUserService) {
 		this.taskRepository = taskRepository;
 		this.userRepository = userRepository;
 		this.projectRepository = projectRepository;
+		this.authenticatedUserService=authenticatedUserService;
 	}
 	
 	private TaskResponseDTO convertToDTO(Task task) {
@@ -49,21 +52,41 @@ public class TaskService {
 	    return dto;
 	}
 	
-	@Transactional()
-	public TaskResponseDTO createTask(TaskRequestDTO task, Long currentUserId) {
-		Project project = projectRepository.findById(task.getProjectId())
-				.orElseThrow(() -> new ResourceNotFoundException("Project Not Found"));
-
-		if (!project.getUser().getId().equals(currentUserId)) {
-			throw new UnauthorizedException("UnAthorized");
+	private Project getOwnedProject(Long ProjectId) {
+		User currentUser=authenticatedUserService.getCurrentUser();
+		
+		Project project=projectRepository.findById(ProjectId).orElseThrow(()->new ResourceNotFoundException("Project Not Found"));
+		
+		if(!project.getUser().getId().equals(currentUser.getId())) {
+			throw new UnauthorizedException("Unauthorized");
 		}
+		return project;
+	}
+	
+	private Task getAuthorizedTask(Long taskId) {
+		User currentUser=authenticatedUserService.getCurrentUser();
+		
+		Task task=taskRepository.findById(taskId).orElseThrow(()->new ResourceNotFoundException("Task not Found"));
+		
+		boolean isAssignedUser=task.getAssignedUser().getId().equals(currentUser.getId());
+		
+		boolean isProjectOwner=task.getProject().getUser().getId().equals(currentUser.getId());
+		
+		if(!isAssignedUser && !isProjectOwner) {
+			throw new UnauthorizedException("Unathorized");
+		}
+		return task;
+	}
+	
+	
+	@Transactional()
+	public TaskResponseDTO createTask(TaskRequestDTO task) {
+		Project project=getOwnedProject(task.getProjectId());
 
 		User assignedUser = userRepository.findById(task.getAssignedUserId())
 				.orElseThrow(() -> new ResourceNotFoundException("Assigned User Not Found"));
 
-		if (!assignedUser.getId().equals(project.getUser().getId())) {
-		    throw new ResourceNotFoundException("Assigned user must belong to project");
-		}
+		
 		Task task1=new Task();
 		task1.setTitle(task.getTitle());
 		task1.setDescription(task.getDescription());
@@ -80,14 +103,10 @@ public class TaskService {
 	}
 
 	@Transactional(readOnly=true)
-	public List<TaskResponseDTO> getTasksByProject(Long projectId, Long currentUserId) {
+	public List<TaskResponseDTO> getTasksByProject(Long projectId) {
 
-		Project project = projectRepository.findById(projectId)
-				.orElseThrow(() -> new ResourceNotFoundException("Project not found"));
-
-		if (!project.getUser().getId().equals(currentUserId)) {
-			throw new UnauthorizedException("Unauthorized");
-		}
+	   Project project=getOwnedProject(projectId);
+	   
 		 List<Task> tasks=taskRepository.findByProjectId(projectId);
 		 
 		 return tasks.stream()
@@ -97,15 +116,11 @@ public class TaskService {
 	}
 
 	@Transactional(readOnly=true)
-	public List<TaskResponseDTO> getTasksByUser(Long userId, Long currentUserId) {
+	public List<TaskResponseDTO> getTasksByUser() {
 
-		User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-		if (!userId.equals(currentUserId)) {
-			throw new UnauthorizedException("Unauthorized");
-		}
-
-		List<Task> tasks= taskRepository.findByAssignedUserId(userId);	
+		User user=authenticatedUserService.getCurrentUser();
+		List<Task> tasks= taskRepository.findByAssignedUserId(user.getId());	
 		
 		return tasks.stream()
 				  .map(task -> convertToDTO(task))
@@ -113,14 +128,9 @@ public class TaskService {
 
 	}
    @Transactional
-	public TaskResponseDTO updateTaskStatus(Long taskId, String status, Long currentUserId) {
-		Task task = taskRepository.findById(taskId).orElseThrow(() -> new ResourceNotFoundException("Task Not Found"));
-
-		if (!task.getAssignedUser().getId().equals(currentUserId)
-				&& !task.getProject().getUser().getId().equals(currentUserId)) {
-			throw new UnauthorizedException("Unauthorized");
-		}
-		
+	public TaskResponseDTO updateTaskStatus(Long taskId, String status) {
+	
+       Task task=getAuthorizedTask(taskId);
 		if (status == null || status.isBlank()) {
 		    throw new BadRequestException("Invalid status");
 		}
