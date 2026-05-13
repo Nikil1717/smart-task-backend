@@ -7,17 +7,24 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+
 
 @Entity
-@Table(name="tasks")
+@Table(name="tasks",indexes = {
+		@Index(name="idx_task_project",
+				columnList="project_id"),
+		
+		@Index(name="idx_task_assigned_user",
+		columnList="assigned_user_id")
+})
 public class Task {
 
 	 @Id
@@ -39,10 +46,10 @@ public class Task {
 	 private LocalDate dueDate;
      @CreationTimestamp
 	 private LocalDateTime createdAt;
-     @ManyToOne
+     @ManyToOne(fetch = FetchType.LAZY)
      @JoinColumn(name="project_id",nullable=false)
 	 private Project project;
-     @ManyToOne
+     @ManyToOne(fetch = FetchType.LAZY)
      @JoinColumn(name="assigned_user_id",nullable=false)
 	 private User assignedUser;
      

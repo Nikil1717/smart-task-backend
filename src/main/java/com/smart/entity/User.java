@@ -1,5 +1,6 @@
 package com.smart.entity;
 
+import java.util.List;
 import java.sql.Timestamp;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -9,12 +10,17 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 
 
 @Entity
-@Table(name="users")
+@Table(name="users",indexes = {
+		@Index(name="idx_user_email",
+				columnList="email")
+})
 public class User {
     
 	@Id
@@ -33,6 +39,9 @@ public class User {
 	private String role;
 	@CreationTimestamp
 	private Timestamp createdAt;
+	
+	@OneToMany(mappedBy = "user")
+	private List<Project> projects;
 	
 	public Long getId() {
 		return id;

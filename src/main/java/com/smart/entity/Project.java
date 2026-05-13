@@ -1,21 +1,29 @@
 package com.smart.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
+
 
 @Entity
-@Table(name="projects")
+@Table(name="projects",indexes= {
+		@Index(name="idx_project_user",
+				columnList="user_id")
+})
 public class Project {
 
 	@Id
@@ -27,9 +35,17 @@ public class Project {
 	private String description;
 	@CreationTimestamp
 	private LocalDateTime createdAt;
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="user_id",nullable=false)
 	private User user;
+	
+	@OneToMany(
+		    mappedBy = "project",
+		    cascade = CascadeType.ALL,
+		    orphanRemoval = true
+		)
+		private List<Task> tasks;
+	
 	public Long getId() {
 		return id;
 	}
