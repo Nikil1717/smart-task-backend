@@ -7,10 +7,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.smart.dto.UserRequestDTO;
 import com.smart.dto.UserResponseDTO;
+import com.smart.dto.UserUpdateRequestDTO;
 import com.smart.service.UserService;
 
 import jakarta.validation.Valid;
@@ -48,6 +50,10 @@ public class UserController {
 		return userService.getMyProfile();
 	}
 	
-	
+	@PutMapping("/user/update")
+	public UserResponseDTO updateUser(@Valid @RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
+	 return userService.updateUser(userUpdateRequestDTO);
+		
+	}
 	
 }
