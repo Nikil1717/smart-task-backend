@@ -27,13 +27,15 @@ public class TaskService {
 	private final UserRepository userRepository;
 	private final ProjectRepository projectRepository;
 	private final AuthenticatedUserService authenticatedUserService;
+	private final ActivityService activityService;
 
 	public TaskService(TaskRepository taskRepository, UserRepository userRepository,
-			ProjectRepository projectRepository,AuthenticatedUserService authenticatedUserService) {
+			ProjectRepository projectRepository,AuthenticatedUserService authenticatedUserService,ActivityService activityService) {
 		this.taskRepository = taskRepository;
 		this.userRepository = userRepository;
 		this.projectRepository = projectRepository;
 		this.authenticatedUserService=authenticatedUserService;
+		this.activityService=activityService;
 	}
 	
 	private TaskResponseDTO convertToDTO(Task task) {
@@ -97,6 +99,15 @@ public class TaskService {
 		task1.setAssignedUser(assignedUser);
 
 		Task task2= taskRepository.save(task1);	 
+		
+		
+		
+		activityService.logTaskCreation(
+		        task1.getTitle(),
+		        assignedUser.getEmail()
+		);
+		
+	
 		
 		return convertToDTO(task2);
 		
