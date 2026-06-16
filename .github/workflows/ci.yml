@@ -34,3 +34,9 @@ jobs:
 
       - name: Build Application
         run: ./mvnw clean package -DskipTests
+
+      - name: Upload JAR Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: smart-task-jar
+          path: target/smart-task-0.0.1-SNAPSHOT.jar
