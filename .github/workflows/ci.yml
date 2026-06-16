@@ -41,6 +41,9 @@ jobs:
           name: smart-task-jar
           path: target/smart-task-0.0.1-SNAPSHOT.jar
 
+      - name: Build Docker Image
+        run: docker build -t smart-task:latest .
+
   verify-artifact:
     needs: build
 
