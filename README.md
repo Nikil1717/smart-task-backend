@@ -6,7 +6,7 @@ A production-oriented backend application built using **Spring Boot** that enabl
 
 ## 🏗️ Architecture
 
-![System Architecture](assets/architecture.png)
+![System Architecture](system-arch.png)
 
 ---
 
