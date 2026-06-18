@@ -177,7 +177,7 @@ Activity Logging
 ## 🚀 Run Locally
 
 ```bash
-git clone <repository-url>
+git clone <https://github.com/Nikil1717/smart-task-backend.git>
 
 cd smart-task
 
